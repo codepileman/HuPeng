@@ -6,12 +6,14 @@ var User = require('../models/hpuser');
 
 module.exports = {
     fetchAllVents: function(postal,user,pageNo,pageSize){
-        var query = Vent.find({Area:{PostalCode:{$regex:postal}}},null,{skip:pageNo*pageSize});
-        return query;
+        var promise = Vent.find({'Area.PostalCode':{$regex:postal}},null,{skip:(pageNo-1)*pageSize,limit:pageSize}).exec();
+        //var promise = Vent.find({}).exec();
+
+        return promise;
     },
     findById : function(id){
-        var query = Vent.findById(id);
-        return query;
+        var promise = Vent.findById(id).exec();
+        return promise;
     },
     updateVent :function (ventObj){
         this.findById(ventObj._id).then(
@@ -20,7 +22,7 @@ module.exports = {
                var query = Vent.findByIdAndUpdate(ventObj._id,ventObj);
                return query.exec();
             }
-        ).error(function(err){
+        ).catch(function(err){
             throw err;
         });
     },
@@ -34,6 +36,11 @@ module.exports = {
     },
     reportVent:function(ventId){
 
+    },
+    deleteVent: function(id){
+        
+       var promise = Vent.remove({_id:id}).exec();
+       return promise;
     }
 
 }
