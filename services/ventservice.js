@@ -1,23 +1,46 @@
+var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 var Vent = require('../models/vent');
 var User = require('../models/hpuser');
 
+
 module.exports = {
     fetchAllVents: function(postal,user,pageNo,pageSize){
-        var query = Vent.find({Area:{PostalCode:{$regex:postal}}},null,{skip:pageNo*pageSize});
-        return query.exec();
+        var promise = Vent.find({'Area.PostalCode':{$regex:postal}},null,{skip:(pageNo-1)*pageSize,limit:pageSize}).exec();
+        //var promise = Vent.find({}).exec();
+
+        return promise;
     },
     findById : function(id){
-        var query = Vent.findById(id);
-        return query.exec();
+        var promise = Vent.findById(id).exec();
+        return promise;
     },
     updateVent :function (ventObj){
-        var vent = new Vent(ventObj);
-        var query = Vent.findByIdAndUpdate(ventObj._id,ventObj);
-        return query.exec();
+        this.findById(ventObj._id).then(
+            function(vent){
+               var newVent = Object.assign(vent,VentObj);
+               var query = Vent.findByIdAndUpdate(ventObj._id,ventObj);
+               return query.exec();
+            }
+        ).catch(function(err){
+            throw err;
+        });
     },
     saveVent : function(ventObj){
         var vent = new Vent(ventObj);
-        var query = Vent.save(null,null,true);
-        return query.exec();
+        var promise = vent.save();
+        return promise;
+    },
+    likeVent:function(ventId){
+
+    },
+    reportVent:function(ventId){
+
+    },
+    deleteVent: function(id){
+        
+       var promise = Vent.remove({_id:id}).exec();
+       return promise;
     }
+
 }

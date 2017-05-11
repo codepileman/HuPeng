@@ -1,9 +1,12 @@
 const sinon = require('sinon')
 const chai = require('chai')
+const mongoose = require('mongoose')
 const sinonChai = require('sinon-chai')
 
 before(function () {
-  chai.use(sinonChai)
+  console.log('!!!init test!!!')
+  chai.use(sinonChai);
+  mongoose.connect('localhost:27017/hupeng');
 })
 
 beforeEach(function () {
@@ -12,4 +15,8 @@ beforeEach(function () {
 
 afterEach(function () {
   this.sandbox.restore()
+})
+
+after(function(){
+  mongoose.connection.close();
 })
