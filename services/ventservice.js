@@ -1,46 +1,104 @@
 var mongoose = require('mongoose');
-mongoose.Promise = require('bluebird');
+const Promise = require('bluebird')
+mongoose.Promise = Promise;
+var async = require("async");
 var Vent = require('../models/vent');
 var User = require('../models/hpuser');
 
-
 module.exports = {
-    fetchAllVents: function(postal,user,pageNo,pageSize){
-        var promise = Vent.find({'Area.PostalCode':{$regex:postal}},null,{skip:(pageNo-1)*pageSize,limit:pageSize}).exec();
-        //var promise = Vent.find({}).exec();
 
+    fetchVentsByPostalCode: function (postalCode, pageNo, pageSize) {
+        var promise = Vent.find({ 'Area.PostalCode': { $regex: postal } }, null, { skip: (pageNo - 1) * pageSize, limit: pageSize }).exec();
         return promise;
+
     },
-    findById : function(id){
+
+    fetchAllVents: function (postalParam, radius, pageNo, pageSize) {
+
+        //get postal service by radius
+        //query postalcode api with postalParam and get postalcodes array;
+        let postalCodes = ['30067'];
+        let searchFuncArray = [];
+
+        for (let a = 0; a < postalCodes.length; a++) {
+            searchFuncArray[a] = function (callback) { Vent.find({ 'Area.PostalCode': { $regex: postalCodes[a] } }, null, { skip: (pageNo - 1) * pageSize, limit: pageSize }, callback); };
+        }
+
+        return new Promise((resolve, reject) => {
+            async.parallel(searchFuncArray,
+                // optional callback
+                function (err, results) {
+                    //need merge result and have unique result;
+                    resolve(results);
+                });
+        }
+        );
+
+    },
+
+    findById: function (id) {
         var promise = Vent.findById(id).exec();
         return promise;
     },
-    updateVent :function (ventObj){
+
+    updateVent: function (ventObj) {
         this.findById(ventObj._id).then(
-            function(vent){
-               var newVent = Object.assign(vent,VentObj);
-               var query = Vent.findByIdAndUpdate(ventObj._id,ventObj);
-               return query.exec();
+            function (vent) {
+                var newVent = Object.assign(vent, VentObj);
+                var query = Vent.findByIdAndUpdate(ventObj._id, ventObj);
+                return query.exec();
             }
-        ).catch(function(err){
+        ).catch(function (err) {
             throw err;
         });
     },
-    saveVent : function(ventObj){
+
+    saveVent: function (ventObj) {
         var vent = new Vent(ventObj);
         var promise = vent.save();
         return promise;
     },
-    likeVent:function(ventId){
+
+    likeVent: function (ventId, user) {
+
+        return new Promise((resolve, reject) => {
+
+            this.findById(ventId).then(function (vent) {
+                vent.LikeIt.push({ Email: user.Email, Nickname: user.Nickname });
+                vent.save().then(function(obj){
+                    resolve(obj);
+                }).catch(function(er){
+                    reject(er);
+                });
+             
+            }).catch(function (err) {
+                reject(err);
+            });
+
+        });
 
     },
-    reportVent:function(ventId){
+
+    reportVent: function (ventId, user) {
+        return new Promise((resolve, reject) => {
+            this.findById(ventId).then(function (vent) {
+                vent.ReportIt.push({ Email: user.Email, Nickname: user.Nickname });
+                vent.save().then(function(obj){
+                    resolve(obj);
+                }).catch(function(er){
+                    reject(er);
+                });
+            }).catch(function (err) {
+                reject(err);
+            });
+
+        });
 
     },
-    deleteVent: function(id){
-        
-       var promise = Vent.remove({_id:id}).exec();
-       return promise;
+
+    deleteVent: function (id) {
+        var promise = Vent.remove({ _id: id }).exec();
+        return promise;
     }
 
 }
