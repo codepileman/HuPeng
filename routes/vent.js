@@ -10,7 +10,7 @@ router.post('/', function(req, res, next) {
         ventService.saveVent().then(function(vent){
             res.json(vent);
             }
-        ).error(function(err){
+        ).catch(function(err){
             res.json();
         });
 });

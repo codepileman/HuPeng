@@ -42,14 +42,19 @@ module.exports = {
     },
 
     updateVent: function (ventObj) {
-        this.findById(ventObj._id).then(
-            function (vent) {
-                var newVent = Object.assign(vent, VentObj);
-                var query = Vent.findByIdAndUpdate(ventObj._id, ventObj);
-                return query.exec();
-            }
-        ).catch(function (err) {
-            throw err;
+        return new Promise((resolve, reject) => {
+
+            this.findById(ventObj._id).then(
+                function (vent) {
+                    Object.assign(vent, ventObj);
+                    var newObj = new Vent(vent);
+                    newObj.save().then(function (svd) { resolve(svd); }).catch(function (err) {
+                        reject(er);
+                    });
+                }
+            ).catch(function (err) {
+                reject(err);
+            });
         });
     },
 
@@ -65,12 +70,12 @@ module.exports = {
 
             this.findById(ventId).then(function (vent) {
                 vent.LikeIt.push({ Email: user.Email, Nickname: user.Nickname });
-                vent.save().then(function(obj){
+                vent.save().then(function (obj) {
                     resolve(obj);
-                }).catch(function(er){
+                }).catch(function (er) {
                     reject(er);
                 });
-             
+
             }).catch(function (err) {
                 reject(err);
             });
@@ -83,9 +88,9 @@ module.exports = {
         return new Promise((resolve, reject) => {
             this.findById(ventId).then(function (vent) {
                 vent.ReportIt.push({ Email: user.Email, Nickname: user.Nickname });
-                vent.save().then(function(obj){
+                vent.save().then(function (obj) {
                     resolve(obj);
-                }).catch(function(er){
+                }).catch(function (er) {
                     reject(er);
                 });
             }).catch(function (err) {
