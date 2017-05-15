@@ -1,6 +1,20 @@
 
 const https = require('https');
-const Promise = require('bluebird')
+const Promise = require('bluebird');
+const NodeGeocoder = require('node-geocoder');
+
+var options = {
+  provider: 'google',
+  // Optional depending on the providers 
+  httpAdapter: 'https', // Default 
+  apiKey: 'AIzaSyDZlFJNkr6LEZMMIVGJb7n0Xf-vBCCcEzQ', // for Mapquest, OpenCage, Google Premier 
+  formatter: null,
+  
+};
+ 
+var geocoder = NodeGeocoder(options);
+ 
+
 
 module.exports = {
 
@@ -22,5 +36,10 @@ module.exports = {
 
         });
 
+    },
+
+    findPostalcodeWithLatLong:function (latitude,longtitude){
+        // Or using Promise 
+      return geocoder.reverse({lat:latitude, lon:longtitude});
     }
 }
