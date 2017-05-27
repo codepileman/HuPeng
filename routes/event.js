@@ -2,13 +2,13 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
 
-var ventService = require('../services/ventservice');
+var eventService = require('../services/eventservice');
 
 
 router.post('/', function(req, res, next) {
     
-        ventService.saveVent().then(function(vent){
-            res.json(vent);
+        eventService.saveVent().then(function(event){
+            res.json(event);
             }
         ).catch(function(err){
             res.json();
@@ -32,9 +32,9 @@ router.get('/',function(req,res,next){
 });
 
 router.get('/:id',function(req,res,next){
-        ventService.findById(req.params.id)
-        .then(function(vent){
-            res.json(vent);
+        eventService.findById(req.params.id)
+        .then(function(event){
+            res.json(event);
         })
         .catch(function(err){
             console.log(err);

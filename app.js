@@ -1,17 +1,21 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const cors =require('cors');
+const appRoutes = require('./routes/app');
+const messageRoutes = require('./routes/messages');
+const userRoutes = require('./routes/user');
+const ventRoutes = require('./routes/vent');
+const multer =require('multer');
+const UPLOAD_PATH='uploads';
+const upload = multer({ dest:`${UPLOAD_PATH}/`});
 
-var appRoutes = require('./routes/app');
-var messageRoutes = require('./routes/messages');
-var userRoutes = require('./routes/user');
-var ventRoutes = require('./routes/vent');
+const app = express();
 
-var app = express();
 mongoose.connect('localhost:27017/hupeng');
 
 // view engine setup
@@ -25,6 +29,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
+
+
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -36,7 +43,6 @@ app.use(function (req, res, next) {
 app.use('/message', messageRoutes);
 app.use('/user', userRoutes);
 app.use('/api/vent',ventRoutes);
-
 app.use('/', appRoutes);
 
 // catch 404 and forward to error handler
