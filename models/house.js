@@ -13,6 +13,10 @@ var houseSchema = Schema({
         Email:String,
         Nickname:String,
     }],
+    LikeIt:[{
+        Email:String,
+        Nickname:String
+    }],
     Status:Number,
     User:{
         Email:String,
