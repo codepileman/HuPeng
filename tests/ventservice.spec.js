@@ -63,7 +63,6 @@ describe('The vent service module', function () {
       });
   });
 
-
   it('delete by id', function () {
 
     return ventService.deleteVent(insertedId).then(function () {
@@ -72,7 +71,7 @@ describe('The vent service module', function () {
       })
     });
   });
-
+   
   it('get the vent', function () {
 
     var ventObj = {
@@ -99,12 +98,61 @@ describe('The vent service module', function () {
         PostalCode: '30068',
       }
     };
-    ventService.saveVent(ventObj).then(function (obj) {
+   return  ventService.saveVent(ventObj).then(function (obj) {
       ventService.findById(obj._id).then(function (savedObj) {
         expect(savedObj).to.not.null; 
-        return ventService.deleteVent(savedObj._id).then(function(vent){
-        });
+        ventService.deleteVent(savedObj._id);
       });
     })
   });
+  it('update vent by id',function(){
+    
+     var ventObj = {
+      Title: "vent 3",
+      Content: "This is vent 3",
+      CreateDate: new Date((new Date()).toUTCString()),
+      LikeIt: [{
+        Email: 'admin@hupengs.com',
+        Nickname: 'admin'
+      },
+      {
+        Email: 'user@hupengs.com',
+        Nickname: 'user'
+      },
+      ],
+      ReportIt: [],
+      Status: 1,
+      User: {
+        Email: 'admin@hupengs.com',
+        Nickname: 'admin',
+      },
+      Area: {
+        Name: 'Sandys Spring',
+        PostalCode: '30068',
+      }
+    };
+    ventService.saveVent(ventObj).then(function (currentObj) {
+    currentObj.Content = 'updated content';
+    currentObj.Status =2;
+
+    ventService.updateVent(currentObj).then(function(){
+        ventService.findById(currentObj._id).then(function(obj){
+
+          expect(obj.Status).to.eql(2);
+          expect(obj.Content).to.eql('updated content');
+          return ventService.deleteVent(obj._id).catch(function(err){
+              console.log('vent was not deleted');
+          });
+        }).catch(function(err){
+          throw err;
+        })
+    }).catch(function(err){
+      throw err;
+    })
+    });
+
+});
+  
+
+
 })

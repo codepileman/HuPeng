@@ -16,5 +16,11 @@ describe('The zipcode service module', function () {
     });
 
   });
+  it('test google maps api',function(){
+    return zipcodeService.findPostalcodeWithLatLong(33.757687, -84.394616).then(function(resultjson){
+      expect(resultjson[0].zipcode).to.eql('30303');
+    });
+
+  });
 
 })
