@@ -16,15 +16,17 @@ module.exports = {
         return promise;
     },
     updateJob: function (jobObj){
-        this.findById(jobObj._id).then(
-            function(job){
-               var newJob = Object.assign(job,jobObj);
-               var query = Job.findByIdAndUpdate(jobObj._id,jobObj);
-               return query.exec();
-            }
-        ).catch(function(err){
-            throw err;
-        });
+      return new Promise((resolve,reject) =>{
+          this.findById(jobObj._id).then(
+              function(job){
+                var newJob = Object.assign(job,jobObj);
+                var query = Job.findByIdAndUpdate(jobObj._id,jobObj);
+                return query.exec();
+              }
+          ).catch(function(err){
+              throw err;
+          });
+       });
     },
     saveJob: function(jobObj){
         var job = new Job(jobObj);
